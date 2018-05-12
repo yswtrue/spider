@@ -1,49 +1,49 @@
 mysql:
-  image: mysql:5.7
+  image:       mysql:5.7
   volumes:
     - ./data/mysql:/var/lib/mysql
+    - ./mysql_conf:/etc/mysql/conf.d
+  command:
+    - --character-set-server=utf8
+    - --collation-server=utf8_unicode_ci
   environment:
     - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-  expose:
-    - 3306
 rabbitmq:
-  image: rabbitmq
+  image:       rabbitmq
 phantomjs:
-  image: yswtrue/pyspider:latest
-  command: phantomjs
+  image:       yswtrue/pyspider:latest
+  command:     phantomjs
 result:
-  image: yswtrue/pyspider:latest
+  image:       yswtrue/pyspider:latest
   links:
     - mysql
     - rabbitmq
-  command: result_worker
+  command:     result_worker
 processor:
-  image: yswtrue/pyspider:latest
+  image:       yswtrue/pyspider:latest
   links:
     - mysql
     - rabbitmq
-  command: processor
+  command:     processor
 fetcher:
-  image: yswtrue/pyspider:latest
+  image:       yswtrue/pyspider:latest
   links:
     - rabbitmq
-  links:
     - phantomjs
-  command : fetcher
+  command :    fetcher
 scheduler:
-  image: yswtrue/pyspider:latest
+  image:       yswtrue/pyspider:latest
   links:
     - mysql
     - rabbitmq
-  command: scheduler
+  command:     scheduler
 webui:
-  image: yswtrue/pyspider:latest
+  image:       yswtrue/pyspider:latest
   links:
     - scheduler
     - phantomjs
     - mysql
     - rabbitmq
-  command: webui
+  command:     webui
   ports:
     - "5000:5000"
-
