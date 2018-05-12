@@ -18,7 +18,7 @@ class Handler(BaseHandler):
 
     @config(age=0)
     def list_page(self, response):
-        for each in response.doc('#subcatlisting_10 a[href^="http"]').items():
+        for each in response.doc('.tag_tx a[href^="http"]').items():
             type = each.text()
             self.crawl(each.attr.href, callback=self.list_detail,
                        save={'type': type})
@@ -31,6 +31,11 @@ class Handler(BaseHandler):
             detail_url = each('span[itemprop="tel"] a[href^="http"]').attr.href
             self.crawl(detail_url, callback=self.detail_page, save={
                        'title': title, 'tel': tel, 'type': response.save['type']})
+        next_page = response.doc('a:contains("下一页")')
+        if next_page:
+            next_page_url = next_page.attr.href
+            self.crawl(next_page_url, callback=self.list_detail,
+                       save={'type': response.save['type']})
 
     @config(age=0)
     def detail_page(self, response):
@@ -44,11 +49,12 @@ class Handler(BaseHandler):
                 name = each.text().replace('联系人：', '').strip()
             if '地址' in label:
                 address = each.text().replace('地址：', '').strip()
+            if '电话' in label:
+                tel = each.text().replace('电话：', '').strip()
             if '手机' in label:
                 tel = each.text().replace('手机：', '').strip()
 
         return {
-            "url": response.url,
             "company_name": response.save['title'],
             "type": response.save['type'],
             "name": name,

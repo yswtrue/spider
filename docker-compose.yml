@@ -1,0 +1,49 @@
+mysql:
+  image: mysql:5.7
+  volumes:
+    - ./data/mysql:/var/lib/mysql
+  environment:
+    - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+  expose:
+    - 3306
+rabbitmq:
+  image: rabbitmq
+phantomjs:
+  image: yswtrue/pyspider:latest
+  command: phantomjs
+result:
+  image: yswtrue/pyspider:latest
+  links:
+    - mysql
+    - rabbitmq
+  command: result_worker
+processor:
+  image: yswtrue/pyspider:latest
+  links:
+    - mysql
+    - rabbitmq
+  command: processor
+fetcher:
+  image: yswtrue/pyspider:latest
+  links:
+    - rabbitmq
+  links:
+    - phantomjs
+  command : fetcher
+scheduler:
+  image: yswtrue/pyspider:latest
+  links:
+    - mysql
+    - rabbitmq
+  command: scheduler
+webui:
+  image: yswtrue/pyspider:latest
+  links:
+    - scheduler
+    - phantomjs
+    - mysql
+    - rabbitmq
+  command: webui
+  ports:
+    - "5000:5000"
+
