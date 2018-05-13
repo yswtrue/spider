@@ -1,0 +1,10 @@
+{
+  "taskdb": "sqlalchemy+mysql+mysqlconnector+taskdb://root@mysql/taskdb?charset=utf8",
+  "projectdb": "sqlalchemy+mysql+mysqlconnector+projectdb://root@mysql/projectdb?charset=utf8",
+  "resultdb": "sqlalchemy+mysql+mysqlconnector+resultdb://root@mysql/resultdb?charset=utf8",
+  "webui": {
+    "username": "some_name",
+    "password": "some_passwd",
+    "need-auth": true
+  }
+}

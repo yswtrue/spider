@@ -1,5 +1,4 @@
-FROM python:3.6
-MAINTAINER binux <roy@binux.me>
+FROM python:3.6-jessie
 
  # install phantomjs
 RUN mkdir -p /opt/phantomjs \
@@ -11,12 +10,8 @@ RUN mkdir -p /opt/phantomjs \
 # install requirements
 COPY requirements.txt /opt/pyspider/requirements.txt
 RUN pip install -r /opt/pyspider/requirements.txt
-# add all repo
-ADD ./ /opt/pyspider
 # run test
-WORKDIR /opt/pyspider
-RUN pip install pyspider
-VOLUME ["/opt/pyspider"]
+WORKDIR /tmp
+RUN pip install pyspider mysql-connector
 ENTRYPOINT ["pyspider"]
 EXPOSE 5000 23333 24444 25555
-RUN pip install mysqlclient
