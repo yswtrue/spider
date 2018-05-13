@@ -37,7 +37,7 @@ class Handler(BaseHandler):
             self.crawl(next_page_url, callback=self.list_detail,
                        save={'type': response.save['type']})
 
-    @config(age=0)
+    @config(age=-1)
     def detail_page(self, response):
         ul = response.doc('ul.con-txt')
         name = ''

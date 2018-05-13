@@ -1,88 +1,90 @@
-mysql:
-  image: 'mysql:5.7'
-  restart: always
-  volumes:
-    - './data/mysql:/var/lib/mysql'
-    - './mysql_conf:/etc/mysql/conf.d'
-  command:
-    - '--character-set-server=utf8'
-    - '--collation-server=utf8_unicode_ci'
-  environment:
-    - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-rabbitmq:
-  image: rabbitmq
-  restart: always
-application:
-  image: alpine
-  volumes:
-    - './etc:/etc/pyspider'
-phantomjs:
-  image: 'yswtrue/pyspider:latest'
-  restart: always
-  mem_limit: 512m
-  command: phantomjs
-result:
-  image: 'yswtrue/pyspider:latest'
-  restart: always
-  links:
-    - mysql
-    - rabbitmq
-  volumes_from:
-    - application
-  command:
-    - '-c'
-    - /etc/pyspider/config.json
-    - result_worker
-processor:
-  image: 'yswtrue/pyspider:latest'
-  restart: always
-  scale: 3
-  links:
-    - mysql
-    - rabbitmq
-  volumes_from:
-    - application
-  command:
-    - '-c'
-    - /etc/pyspider/config.json
-    - processor
-fetcher:
-  image: 'yswtrue/pyspider:latest'
-  restart: always
-  links:
-    - rabbitmq
-    - phantomjs
-  volumes_from:
-    - application
-  command:
-    - '-c'
-    - /etc/pyspider/config.json
-    - fetcher
-scheduler:
-  image: 'yswtrue/pyspider:latest'
-  restart: always
-  links:
-    - mysql
-    - rabbitmq
-  volumes_from:
-    - application
-  command:
-    - '-c'
-    - /etc/pyspider/config.json
-    - scheduler
-webui:
-  image: 'yswtrue/pyspider:latest'
-  restart: always
-  links:
-    - scheduler
-    - phantomjs
-    - mysql
-    - rabbitmq
-  volumes_from:
-    - application
-  command:
-    - '-c'
-    - /etc/pyspider/config.json
-    - webui
-  ports:
-    - '5000:5000'
+version: '2.4'
+services:
+  mysql:
+    image: 'mysql:5.7'
+    restart: always
+    volumes:
+      - './data/mysql:/var/lib/mysql'
+      - './mysql_conf:/etc/mysql/conf.d'
+    command:
+      - '--character-set-server=utf8'
+      - '--collation-server=utf8_unicode_ci'
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+  rabbitmq:
+    image: rabbitmq
+    restart: always
+  application:
+    image: alpine
+    volumes:
+      - './etc:/etc/pyspider'
+  phantomjs:
+    image: 'yswtrue/pyspider:latest'
+    restart: always
+    mem_limit: 512m
+    command: phantomjs
+  result:
+    image: 'yswtrue/pyspider:latest'
+    restart: always
+    links:
+      - mysql
+      - rabbitmq
+    volumes_from:
+      - application
+    command:
+      - '-c'
+      - /etc/pyspider/config.json
+      - result_worker
+  processor:
+    image: 'yswtrue/pyspider:latest'
+    restart: always
+    scale: 3
+    links:
+      - mysql
+      - rabbitmq
+    volumes_from:
+      - application
+    command:
+      - '-c'
+      - /etc/pyspider/config.json
+      - processor
+  fetcher:
+    image: 'yswtrue/pyspider:latest'
+    restart: always
+    links:
+      - rabbitmq
+      - phantomjs
+    volumes_from:
+      - application
+    command:
+      - '-c'
+      - /etc/pyspider/config.json
+      - fetcher
+  scheduler:
+    image: 'yswtrue/pyspider:latest'
+    restart: always
+    links:
+      - mysql
+      - rabbitmq
+    volumes_from:
+      - application
+    command:
+      - '-c'
+      - /etc/pyspider/config.json
+      - scheduler
+  webui:
+    image: 'yswtrue/pyspider:latest'
+    restart: always
+    links:
+      - scheduler
+      - phantomjs
+      - mysql
+      - rabbitmq
+    volumes_from:
+      - application
+    command:
+      - '-c'
+      - /etc/pyspider/config.json
+      - webui
+    ports:
+      - '5000:5000'
